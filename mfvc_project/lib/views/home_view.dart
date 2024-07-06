@@ -41,7 +41,17 @@ class _HomeViewState extends State<HomeView> {
       setState(() {
         _persons[index] = updatedPerson;
       });
+      print(_persons);
     }
+  }
+
+
+  void _handlePersonCreate(dynamic newPerson) {
+ newPerson['id']=int.parse(newPerson['id'].toString());
+    setState(() {
+      _persons.add(newPerson);
+    });
+    print(_persons);
   }
 
   void _editPerson(int index) async {
@@ -50,12 +60,29 @@ class _HomeViewState extends State<HomeView> {
       MaterialPageRoute(
         builder: (context) => PersonFormView(
           person: _persons[index],
-          onSaved: _loadPersons,
+          onSaved: () {}, // No necesita llamar a _loadPersons
         ),
       ),
     );
+    print(updatedPerson);
     if (updatedPerson != null) {
       _handlePersonUpdate(updatedPerson);
+    }
+  }
+
+  void _createPerson() async {
+    final newPerson = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PersonFormView(
+          onSaved: () {}, // No necesita llamar a _loadPersons
+        ),
+      ),
+    );
+    print(newPerson);
+
+    if (newPerson != null) {
+      _handlePersonCreate(newPerson);
     }
   }
 
@@ -74,12 +101,7 @@ class _HomeViewState extends State<HomeView> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => PersonFormView(onSaved: _loadPersons)),
-          );
-        },
+        onPressed: _createPerson,
         child: Icon(Icons.add),
         tooltip: 'Add New Person',
       ),

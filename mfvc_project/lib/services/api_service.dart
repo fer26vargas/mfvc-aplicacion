@@ -22,41 +22,47 @@ class ApiService {
     var response = await http.get(Uri.parse('$baseUrl/users?page=2'));
     if (response.statusCode == 200) {
       Map<String, dynamic> data = jsonDecode(response.body);
-      return data['data'];  
+      return data['data'];
     } else {
       throw Exception('Failed to load persons');
     }
   }
 
-  Future<dynamic> createPerson(String name, String job) async {
-    var url = Uri.parse('$baseUrl/users'); 
+  Future<dynamic> createPerson( String email, String firstName, String lastName, String avatar) async {
+    var url = Uri.parse('$baseUrl/users');
     var response = await http.post(
       url,
       body: jsonEncode({
-        'name': name,
-        'job': job
+        'email': email,
+        'first_name': firstName,
+        'last_name': lastName,
+        'avatar': avatar
       }),
       headers: {'Content-Type': 'application/json'},
     );
     if (response.statusCode == 201) {
-      return jsonDecode(response.body); 
+      return jsonDecode(response.body);
     } else {
       throw Exception('Failed to create person. Status code: ${response.statusCode}');
     }
   }
 
-  Future<dynamic> updatePerson(int id, String name, String job) async {
+  Future<dynamic> updatePerson(int id, String email, String firstName, String lastName, String avatar) async {
     var url = Uri.parse('$baseUrl/users/$id');
     var response = await http.put(
       url,
       body: jsonEncode({
-        'name': name,
-        'job': job
+        'email': email,
+        'first_name': firstName,
+        'last_name': lastName,
+        'avatar': avatar
       }),
       headers: {'Content-Type': 'application/json'},
     );
     if (response.statusCode == 200) {
-      return jsonDecode(response.body); 
+      var updatedPerson = jsonDecode(response.body);
+      updatedPerson['id'] = id;
+      return updatedPerson;
     } else {
       throw Exception('Failed to update person. Status code: ${response.statusCode}');
     }
@@ -65,8 +71,7 @@ class ApiService {
   Future<void> deletePerson(int id) async {
     var url = Uri.parse('$baseUrl/users/$id');
     var response = await http.delete(url);
-    
-    if (response.statusCode != 204) { 
+    if (response.statusCode != 204) {
       throw Exception('Failed to delete person. Status code: ${response.statusCode}');
     }
   }
